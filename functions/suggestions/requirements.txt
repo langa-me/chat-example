@@ -1,0 +1,3 @@
+firebase-admin
+openai
+functions-framework

@@ -1,0 +1,7 @@
+# python garbage
+env
+__pycache__
+
+
+# secrets
+.env

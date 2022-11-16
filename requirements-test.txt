@@ -1,0 +1,12 @@
+black
+mypy
+pylint
+pytest-cov
+pytest-xdist
+pytest
+ipykernel
+Flask
+ipywidgets
+firebase-admin
+openai
+functions-framework
