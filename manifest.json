@@ -1,6 +1,6 @@
 {
-  "short_name": "codex-code-translation",
-  "name": "Translate code to code using OpenAI Codex",
+  "short_name": "chat-example",
+  "name": "chat-example",
   "icons": [
     {
       "src": "favicon.ico",
@@ -23,7 +23,7 @@
       "sizes": "180x180"
     }
   ],
-  "start_url": ".",
+  "start_url": "/chat-example",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
