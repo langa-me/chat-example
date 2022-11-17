@@ -19,6 +19,8 @@ const notTooUglyTextArea = {
 
 const url = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
+const isMobile = window.innerWidth < 500;
+
 function App() {
   const [suggestions, setSuggestions] = React.useState([]);
   const [error, setError] = React.useState("");
@@ -67,7 +69,13 @@ function App() {
         height: "100vh",
       }}
     >
-      <a href="https://langa.me"><img src={Logo} alt="logo" style={{width: "200px"}} /></a>
+      <a href="https://langa.me"><img src={Logo} alt="logo" style={{
+        width: "30%",
+        // center
+        marginLeft: "auto",
+        marginRight: "auto",
+        display: "block",
+      }} /></a>
       <div
         // two input texts aligned side by side
         // and a button below
@@ -95,12 +103,12 @@ function App() {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              margin: "10px",
+              margin: isMobile ? "5px" : "10px",
             }}
           >
             <input type="text"
               style={{
-                margin: "10px",
+                margin: isMobile ? "5px" : "10px",
               }}
               placeholder="Name"
               value={names[0]}
@@ -109,7 +117,7 @@ function App() {
             <textarea
               style={notTooUglyTextArea}
               placeholder="Bio"
-              cols={30}
+              cols={isMobile ? 15 : 40}
               rows={10}
               value={bios[0]}
               onChange={(e) => setBios([e.target.value, bios[1]])}
@@ -123,12 +131,12 @@ function App() {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              margin: "10px",
+              margin: isMobile ? "5px" : "10px",
             }}
           >
             <input type="text"
               style={{
-                margin: "10px",
+                margin: isMobile ? "5px" : "10px",
               }}
               placeholder="Name"
               value={names[1]}
@@ -137,7 +145,7 @@ function App() {
             <textarea
               style={notTooUglyTextArea}
               placeholder="Bio"
-              cols={30}
+              cols={isMobile ? 15 : 40}
               rows={10}
               value={bios[1]}
               onChange={(e) => setBios([bios[0], e.target.value])}
@@ -186,7 +194,9 @@ function App() {
           fontStyle: "italic",
         }}
         target="_blank" rel="noopener noreferrer"
-        href="https://github.com/langa-me/chat-example">made with ❤️ by Langame 😛</a>
+        href="https://github.com/langa-me/chat-example">{
+          isMobile ? "❤️😛❤️" : "made with ❤️ by Langame 😛"
+        }</a>
     </div>
   );
 }
