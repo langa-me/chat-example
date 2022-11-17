@@ -151,15 +151,28 @@ def chat(request):
     # TODO: Make this async
     for name, bio in zip(names, bios):
         prompt = f"Name: {name}\nBio:{bio}\nConversation topics:\n-"
-        response = openai.Completion.create(
-            model="text-davinci-002",
-            prompt=prompt,
-            temperature=0.7,
-            max_tokens=256,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-        )
+        try:
+            response = openai.Completion.create(
+                model="text-davinci-002",
+                prompt=prompt,
+                temperature=0.7,
+                max_tokens=256,
+                top_p=1,
+                frequency_penalty=0,
+                presence_penalty=0,
+            )
+        except Exception as e:
+            return (
+                {
+                    "error": {
+                        "message": f"OpenAI error: {e}",
+                        "status": "openai-error",
+                    },
+                    "results": [],
+                },
+                500,
+                headers,
+            )
         topics = response["choices"][0]["text"].split("\n-")
         topics = [topic.strip() for topic in topics]
         topics_per_name[name] = topics

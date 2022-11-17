@@ -45,14 +45,16 @@ function App() {
       },
     }).then(async (r) => {
       if (r.status !== 200) {
-        setError("Error: " + r.status);
+        setError("Something went wrong");
+        r.json().then(console.error);
         return;
       }
       const rJson = await r.json();
       setSuggestions(rJson["results"].map((x: any) =>
         x["conversation_starter"]["en"]));
     }).catch((e) => {
-      setError(e.error);
+      setError("Something went wrong");
+      console.error(e);
     }).finally(() => {
       setLoading(false);
     });
@@ -109,6 +111,7 @@ function App() {
             <input type="text"
               style={{
                 margin: isMobile ? "5px" : "10px",
+                width: "60%",
               }}
               placeholder="Name"
               value={names[0]}
@@ -117,7 +120,7 @@ function App() {
             <textarea
               style={notTooUglyTextArea}
               placeholder="Bio"
-              cols={isMobile ? 15 : 40}
+              cols={isMobile ? 20 : 40}
               rows={10}
               value={bios[0]}
               onChange={(e) => setBios([e.target.value, bios[1]])}
@@ -137,6 +140,7 @@ function App() {
             <input type="text"
               style={{
                 margin: isMobile ? "5px" : "10px",
+                width: "60%",
               }}
               placeholder="Name"
               value={names[1]}
@@ -145,7 +149,7 @@ function App() {
             <textarea
               style={notTooUglyTextArea}
               placeholder="Bio"
-              cols={isMobile ? 15 : 40}
+              cols={isMobile ? 20 : 40}
               rows={10}
               value={bios[1]}
               onChange={(e) => setBios([bios[0], e.target.value])}
