@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 import React from "react";
-
+import Logo from "./assets/logo-colourless.png";
 const defaultParams = {
   "names": ["Bob", "Alice"],
   "bios": [
@@ -25,7 +25,6 @@ function App() {
   const [names, setNames] = React.useState<string[]>(defaultParams.names);
   const [bios, setBios] = React.useState<string[]>(defaultParams.bios);
   const [loading, setLoading] = React.useState(false);
-  console.log("suggestions", suggestions);
 
   const query = async () => {
     setLoading(true);
@@ -38,23 +37,16 @@ function App() {
     fetch(url, {
       method: "POST",
       body: JSON.stringify(param),
-      // mode: "no-cors",
       headers: {
         "Content-Type": "application/json",
-        // "Origin": "http://localhost:8080",
-
-        // "Origin": "http://localhost:3000",
-        // "Access-Control-Allow-Origin": "*",
+        "Accept": "application/json",
       },
     }).then(async (r) => {
-      // console.log(r);
-      // console.log(await r.text());
       if (r.status !== 200) {
         setError("Error: " + r.status);
         return;
       }
       const rJson = await r.json();
-      console.log(rJson["results"]);
       setSuggestions(rJson["results"].map((x: any) =>
         x["conversation_starter"]["en"]));
     }).catch((e) => {
@@ -75,6 +67,7 @@ function App() {
         height: "100vh",
       }}
     >
+      <a href="https://langa.me"><img src={Logo} alt="logo" style={{width: "200px"}} /></a>
       <div
         // two input texts aligned side by side
         // and a button below
@@ -160,15 +153,18 @@ function App() {
             padding: "0.5rem",
             marginTop: "1rem",
             color: "white",
-            backgroundColor: loading ? "grey" : "blue",
+            backgroundColor: loading ? "grey" : "black",
             border: "none",
             borderRadius: "0.5rem",
-            // hover effect
-            cursor: "pointer",
+            cursor: loading ? "not-allowed" : "pointer",
           }}
           onClick={query}
           disabled={loading}
-        >Get conversation starter suggestions</button>
+        >
+          {
+            loading ? "..." : "Get conversation starter suggestions"
+          }
+        </button>
       </div>
       <p style={{
         color: "red",
@@ -181,6 +177,16 @@ function App() {
         rows={10}
         value={suggestions.join("\n---\n")}
       />
+      <a
+        style={{
+          position: "absolute",
+          bottom: "10px",
+          right: "10px",
+          // color: "white",
+          fontStyle: "italic",
+        }}
+        target="_blank" rel="noopener noreferrer"
+        href="https://github.com/langa-me/chat-example">made with ❤️ by Langame 😛</a>
     </div>
   );
 }

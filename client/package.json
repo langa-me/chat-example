@@ -1,8 +1,8 @@
 {
-  "name": "codex-code-translation-client",
-  "version": "0.1.8",
+  "name": "chat-example",
+  "version": "0.1.0",
   "private": true,
-  "homepage": "https://codex.louis030195.com",
+  "homepage": "https://chat-example.langa.me",
   "dependencies": {
     "@types/node": "^18.11.9",
     "@types/react": "^18.0.25",

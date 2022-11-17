@@ -22,43 +22,40 @@ assert openai.api_key is not None, "Missing OPENAI_KEY environment variable."
 assert openai.organization is not None, "Missing OPENAI_ORG environment variable."
 assert LANGAME_API_KEY is not None, "Missing LANGAME_API_KEY environment variable."
 
-logger = logging.getLogger("suggestions")
+logger = logging.getLogger("chat_example")
 logging.basicConfig(level=logging.INFO)
 db: Client = firestore.client()
 
 RATE_LIMIT = 5
 
 
-@functions_framework.http
-def suggestions(request):
-
+def chat(request):
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Origin, Accept",
+        "Access-Control-Max-Age": "3600",
+    }
     # Set CORS headers for the preflight request
     if request.method == "OPTIONS":
         # Allows GET requests from any origin with the Content-Type
         # header and caches preflight response for an 3600s
-        headers = {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET",
-            "Access-Control-Allow-Headers": ["Content-Type"],
-            "Access-Control-Max-Age": "3600",
-        }
+        # headers = {
+        #     **headers,
+        #     "Access-Control-Max-Age": "3600",
+        # }
 
         return (
-            jsonify(
-                {
-                    "error": {
-                        "message": "This is a preflight request.",
-                        "status": "preflight",
-                    },
-                    "results": [],
-                }
-            ),
+            {
+                "error": {
+                    "message": "This is a preflight request.",
+                    "status": "preflight",
+                },
+                "results": [],
+            },
             204,
             headers,
         )
-
-    # Set CORS headers for the main request
-    headers = {"Access-Control-Allow-Origin": "*"}
 
     # if testing, return a dummy response
     if os.environ.get("TESTING", "false") == "true":
@@ -80,7 +77,7 @@ def suggestions(request):
                         "conversation_starter": {
                             "en": "How do you like the weather today?",
                         },
-                    }
+                    },
                 ],
             },
             200,
@@ -91,15 +88,13 @@ def suggestions(request):
     origin = request.headers.get("Origin", None)
     if origin is None:
         return (
-            jsonify(
-                {
-                    "error": {
-                        "message": "Missing origin header.",
-                        "status": "missing-origin",
-                    },
-                    "results": [],
-                }
-            ),
+            {
+                "error": {
+                    "message": "Missing origin header.",
+                    "status": "missing-origin",
+                },
+                "results": [],
+            },
             400,
             headers,
         )
@@ -110,15 +105,13 @@ def suggestions(request):
         last_request = last_request.to_dict()
         if last_request["last_request"] > datetime.now().timestamp() - RATE_LIMIT:
             return (
-                jsonify(
-                    {
-                        "error": {
-                            "message": "Rate limit exceeded.",
-                            "status": "rate-limit-exceeded",
-                        },
-                        "results": [],
-                    }
-                ),
+                {
+                    "error": {
+                        "message": "Rate limit exceeded.",
+                        "status": "rate-limit-exceeded",
+                    },
+                    "results": [],
+                },
                 429,
                 headers,
             )
@@ -131,29 +124,25 @@ def suggestions(request):
     bios = json_data.get("bios", None)
     if not names:
         return (
-            jsonify(
-                {
-                    "error": {
-                        "message": "Missing names parameter.",
-                        "status": "missing_names",
-                    },
-                    "results": [],
-                }
-            ),
+            {
+                "error": {
+                    "message": "Missing names parameter.",
+                    "status": "missing_names",
+                },
+                "results": [],
+            },
             400,
             headers,
         )
     if not bios:
         return (
-            jsonify(
-                {
-                    "error": {
-                        "message": "Missing bios parameter.",
-                        "status": "missing_bios",
-                    },
-                    "results": [],
-                }
-            ),
+            {
+                "error": {
+                    "message": "Missing bios parameter.",
+                    "status": "missing_bios",
+                },
+                "results": [],
+            },
             400,
             headers,
         )
@@ -177,7 +166,7 @@ def suggestions(request):
     # call Langame API to get conversation starter suggestions
     # that both people will like
     url = "https://api.langa.me/v1/conversation/starter"
-    headers = {
+    h = {
         "Content-Type": "application/json",
         "X-Api-Key": LANGAME_API_KEY,
     }
@@ -185,47 +174,40 @@ def suggestions(request):
         "topics": topics,
         "limit": 1,
     }
-    response = requests.post(url, headers=headers, json=data)
+    response = requests.post(url, headers=h, json=data)
     if response.status_code != 200:
         return (
-            jsonify(
-                {
-                    "error": {
-                        "message": "Error calling Langame API.",
-                        "status": "langame_api_error",
-                    },
-                    "results": [],
-                }
-            ),
+            {
+                "error": {
+                    "message": "Error calling Langame API.",
+                    "status": "langame_api_error",
+                },
+                "results": [],
+            },
             500,
             headers,
         )
     json_reponse = response.json()
-    print("eee", json_reponse)
     conversation_starters = json_reponse.get("results", [])
     if not conversation_starters or not conversation_starters[0].get(
         "conversation_starter", None
     ):
         return (
-            jsonify(
-                {
-                    "error": {
-                        "message": "No conversation starters found.",
-                        "status": "no_conversation_starters",
-                    },
-                    "results": [],
-                }
-            ),
+            {
+                "error": {
+                    "message": "No conversation starters found.",
+                    "status": "no_conversation_starters",
+                },
+                "results": [],
+            },
             500,
             headers,
         )
     return (
-        jsonify(
-            {
-                "error": None,
-                "results": conversation_starters,
-            }
-        ),
+        {
+            "error": None,
+            "results": conversation_starters,
+        },
         200,
         headers,
     )

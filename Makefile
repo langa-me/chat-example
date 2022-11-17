@@ -9,8 +9,8 @@ ifeq (, $(shell ls .env))
 $(error "No .env file found. Please create one with the appropriate variables.")
 endif
 
-fn/suggestions/deploy: ## [Local development] Deploy the function.
-	gcloud functions deploy suggestions \
+fn/chat_example/deploy: ## [Local development] Deploy the function.
+	gcloud functions deploy chat \
 		--runtime python39 \
 		--timeout 180 \
 		--set-env-vars LANGAME_API_KEY=${LANGAME_API_KEY} \
@@ -19,12 +19,25 @@ fn/suggestions/deploy: ## [Local development] Deploy the function.
 		--trigger-http \
 		--region ${REGION} \
 		--allow-unauthenticated \
-		--source functions/suggestions
+		--source functions/chat_example
 
-fn/suggestions/test: ## [Local development] Test the function.
-	cd functions/suggestions;\
+fn/chat_example/test: ## [Local development] Test the function.
+	cd functions/chat_example;\
 	LANGAME_API_KEY=${LANGAME_API_KEY} OPENAI_KEY=${OPENAI_KEY} OPENAI_ORG=${OPENAI_ORG} \
-		functions_framework --target=suggestions --debug
+		functions_framework --target=chat --debug
+
+release: ## [Local development] Release the repo.
+	read -p "Version:" VERSION; \
+	echo "Releasing version $$VERSION"; \
+	git add .; \
+	read -p "Commit content:" COMMIT; \
+	echo "Committing '$$VERSION: $$COMMIT'"; \
+	git commit -m "$$VERSION: $$COMMIT"; \
+	git push origin main; \
+	git tag $$VERSION; \
+	git push origin $$VERSION
+	@echo "Done, check https://github.com/langa-me/chat-example/actions"
+
 
 .PHONY: help
 

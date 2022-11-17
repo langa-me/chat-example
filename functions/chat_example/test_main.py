@@ -2,8 +2,8 @@ import unittest
 import requests
 
 
-class TestSuggestions(unittest.TestCase):
-    def test_suggestions(self):
+class TestChatExample(unittest.TestCase):
+    def test_chat_example(self):
         url = "http://localhost:8080"
         param = {
             "names": ["Bob", "Alice"],

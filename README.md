@@ -1,5 +1,11 @@
 # chat-example
 
+Finding a conversation topics that suit two different persons is not an easy task.
+
+This is a simple application that let you get conversation starters according to two different personalities. The goal is to help people to find a common ground to start a conversation.
+
+Powered by [Langame 😛 API](https://langa.me)
+
 ## Development
 
 ```bash
@@ -8,15 +14,9 @@ source env/bin/activate
 pip install -r requirements-test.txt
 ```
 
-Build with ❤️ using:
-TODO
 
 ## Contributing
 
 ### How to release
 
-1. CTRL+SHIFT+F "1.0.x" and bump all (and 0.1.x)
-2. git commit -a -m "my awesome feature"
-3. git push
-4. git tag v1.0.x
-5. git push --tags
+`make release`

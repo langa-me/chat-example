@@ -3,7 +3,7 @@
     "python.testing.unittestArgs": [
         "-v",
         "-s",
-        "./functions/suggestions",
+        "./functions/chat_example",
         "-p",
         "test*.py"
     ],

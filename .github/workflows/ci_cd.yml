@@ -3,7 +3,7 @@ name: Deploy
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "*.*.*"
 
 jobs:
   docker:
@@ -16,11 +16,11 @@ jobs:
         name: Get the tag
         id: get_tag_name
         run: echo ::set-output name=GIT_TAG_NAME::${GITHUB_REF/refs\/tags\//}
-      - uses: google-github-actions/setup-gcloud@master
-      - 
-        name: Turn svc into base64
-        run: |
-          echo "GCP_SA_KEY_AS_BASE64=$(echo '${{ secrets.GCP_SA_KEY }}' | python -m base64)" >> $GITHUB_ENV
+      # - uses: google-github-actions/setup-gcloud@master
+      # - 
+      #   name: Turn svc into base64
+      #   run: |
+      #     echo "GCP_SA_KEY_AS_BASE64=$(echo '${{ secrets.GCP_SA_KEY }}' | python -m base64)" >> $GITHUB_ENV
       # - 
       #   name: Deploy to Cloud Functions
       #   id: deploy
@@ -30,8 +30,8 @@ jobs:
       # - 
       #   name: Echo URL
       #   run: echo "${{ steps.deploy.outputs.url }}"
-      # - 
-      #   name: Release
-      #   uses: softprops/action-gh-release@v1
-      #   env:
-      #     GITHUB_REPOSITORY: langa-me/chat-example
+      - 
+        name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_REPOSITORY: langa-me/chat-example
