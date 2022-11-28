@@ -6,6 +6,8 @@ This is a simple application that let you get conversation starters according to
 
 Powered by [Langame 😛 API](https://langa.me)
 
+https://user-images.githubusercontent.com/25003283/202859676-78c4d1b9-02e3-4837-a9b5-b0a6cc46c2ca.mov
+
 ## Development
 
 ```bash
