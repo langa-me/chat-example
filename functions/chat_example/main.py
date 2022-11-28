@@ -26,8 +26,6 @@ logger = logging.getLogger("chat_example")
 logging.basicConfig(level=logging.INFO)
 db: Client = firestore.client()
 
-RATE_LIMIT = 5
-
 
 def chat(request):
     headers = {
@@ -38,13 +36,6 @@ def chat(request):
     }
     # Set CORS headers for the preflight request
     if request.method == "OPTIONS":
-        # Allows GET requests from any origin with the Content-Type
-        # header and caches preflight response for an 3600s
-        # headers = {
-        #     **headers,
-        #     "Access-Control-Max-Age": "3600",
-        # }
-
         return (
             {
                 "error": {
@@ -84,44 +75,10 @@ def chat(request):
             headers,
         )
 
-    # Check rate limit
-    origin = request.headers.get("Origin", None)
-    if origin is None:
-        return (
-            {
-                "error": {
-                    "message": "Missing origin header.",
-                    "status": "missing-origin",
-                },
-                "results": [],
-            },
-            400,
-            headers,
-        )
-    # remove http:// or https://
-    origin = origin.replace("http://", "").replace("https://", "")
-    last_request = db.collection("rate_limits").document(origin).get()
-    if last_request.exists:
-        last_request = last_request.to_dict()
-        if last_request["last_request"] > datetime.now().timestamp() - RATE_LIMIT:
-            return (
-                {
-                    "error": {
-                        "message": "Rate limit exceeded.",
-                        "status": "rate-limit-exceeded",
-                    },
-                    "results": [],
-                },
-                429,
-                headers,
-            )
-    db.collection("rate_limits").document(origin).set(
-        {"last_request": datetime.now().timestamp()}
-    )
-
     json_data = request.get_json()
     names = json_data.get("names", None)
     bios = json_data.get("bios", None)
+    limit = json_data.get("limit", 3)
     if not names:
         return (
             {
@@ -147,35 +104,6 @@ def chat(request):
             headers,
         )
 
-    topics_per_name = {}
-    # TODO: Make this async
-    for name, bio in zip(names, bios):
-        prompt = f"Name: {name}\nBio:{bio}\nConversation topics:\n-"
-        try:
-            response = openai.Completion.create(
-                model="text-davinci-002",
-                prompt=prompt,
-                temperature=0.7,
-                max_tokens=256,
-                top_p=1,
-                frequency_penalty=0,
-                presence_penalty=0,
-            )
-        except Exception as e:
-            return (
-                {
-                    "error": {
-                        "message": f"OpenAI error: {e}",
-                        "status": "openai-error",
-                    },
-                    "results": [],
-                },
-                500,
-                headers,
-            )
-        topics = response["choices"][0]["text"].split("\n-")
-        topics = [topic.strip() for topic in topics]
-        topics_per_name[name] = topics
     # call Langame API to get conversation starter suggestions
     # that both people will like
     url = "https://api.langa.me/v1/conversation/starter"
@@ -184,8 +112,8 @@ def chat(request):
         "X-Api-Key": LANGAME_API_KEY,
     }
     data = {
-        "topics": topics,
-        "limit": 1,
+        "personas": bios,
+        "limit": limit,
     }
     response = requests.post(url, headers=h, json=data)
     if response.status_code != 200:
